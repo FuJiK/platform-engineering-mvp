@@ -1,0 +1,21 @@
+{:service :platform-mvp-web
+ :environment :local
+
+ :container
+ {:image "nginx:alpine"
+  :host-port 8080
+  :container-port 80}
+
+ ;; ここが Provisioning と Day-2 Operations の共通 Domain Model。
+ ;; delete / destroy / arbitrary-shell のような危険操作は、そもそも DSL で許可しない。
+ :operations
+ {:get-status
+  {:roles #{:operator :sre}}
+
+  :get-logs
+  {:roles #{:operator :sre}
+   :max-lines 200}
+
+  :restart-service
+  {:roles #{:sre}
+   :approval :required}}}

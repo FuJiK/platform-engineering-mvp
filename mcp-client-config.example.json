@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "platform-mvp-operator": {
+      "command": "clojure",
+      "args": ["-M:mcp"],
+      "env": {
+        "PLATFORM_ROLE": "operator"
+      }
+    }
+  }
+}

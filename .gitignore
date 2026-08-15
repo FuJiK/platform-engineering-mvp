@@ -1,0 +1,13 @@
+.terraform/
+.terraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.*
+generated/.terraform/
+generated/terraform.tfstate
+generated/terraform.tfstate.*
+generated/main.tf.json
+generated/ops-policy.json
+.cpcache/
+.tools/
+linux-install.sh
+.DS_Store
