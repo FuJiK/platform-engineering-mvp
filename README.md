@@ -204,3 +204,7 @@ Phase 4: MCP Gateway + Catalog
 Phase 5: Approval / Audit / Rate Limit
 Phase 6: AI Operator
 ```
+
+## License
+
+MIT License — Copyright (c) 2026 [K_fujiokA](LICENSE)
