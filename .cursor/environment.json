@@ -1,0 +1,6 @@
+{
+  "name": "platform-engineering-mvp",
+  "repositoryDependencies": [
+    "github.com/FuJiK/myblog"
+  ]
+}
