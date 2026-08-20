@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# WSL demo: CRLF fix, PATH normalization, then full end-to-end demo.
+# WSL demo: bootstrap if needed, then full demo.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -14,65 +14,40 @@ ok()   { echo -e "${GREEN}✓${NC} $1"; }
 warn() { echo -e "${YELLOW}⚠${NC}  $1"; }
 err()  { echo -e "${RED}✗${NC} $1"; exit 1; }
 
-step "WSL preflight"
-
 if ! grep -qiE 'microsoft|wsl' /proc/version 2>/dev/null; then
-  warn "Not running under WSL — falling back to ./scripts/demo.sh"
+  warn "Not WSL — using ./scripts/demo.sh"
   exec ./scripts/demo.sh
 fi
-ok "WSL detected: $(grep -oP 'PRETTY_NAME="\K[^"]+' /etc/os-release 2>/dev/null || uname -r)"
 
-if [[ "$PWD" == /mnt/* ]]; then
-  warn "Repo is on Windows drive ($PWD)"
-  warn "If you hit errors, copy to WSL home: cp -r \"$PWD\" ~/platform-engineering-mvp"
-else
-  ok "Repo is on WSL filesystem ($PWD)"
-fi
-
-step "Fix CRLF line endings (Windows clone)"
-./scripts/fix-line-endings.sh
-ok "scripts/*.sh and deps.edn normalized to LF"
-
-step "Normalize PATH for non-interactive shells"
+# Auto-bootstrap if clojure missing or on Windows PATH
 export PATH="/usr/local/bin:/usr/local/sbin:$HOME/.local/bin:$PATH"
-
-if [[ -x /usr/local/bin/clojure ]]; then
-  export CLOJURE_BIN=/usr/local/bin/clojure
-  ok "Using WSL clojure: $CLOJURE_BIN"
-elif command -v clojure >/dev/null 2>&1; then
-  CLOJURE_PATH="$(command -v clojure)"
-  if [[ "$CLOJURE_PATH" == /mnt/* ]]; then
-    err "clojure resolves to Windows path ($CLOJURE_PATH). Install inside WSL:
-  curl -L -O https://github.com/clojure/brew-install/releases/latest/download/linux-install.sh
-  chmod +x linux-install.sh && sudo ./linux-install.sh"
-  fi
-  export CLOJURE_BIN="$CLOJURE_PATH"
-  ok "Using clojure: $CLOJURE_BIN"
-else
-  err "clojure not found in WSL. Install:
-  curl -L -O https://github.com/clojure/brew-install/releases/latest/download/linux-install.sh
-  chmod +x linux-install.sh && sudo ./linux-install.sh"
+NEED_BOOTSTRAP=0
+if [[ ! -x /usr/local/bin/clojure ]]; then
+  NEED_BOOTSTRAP=1
+elif [[ "$(command -v clojure 2>/dev/null || true)" == /mnt/* ]]; then
+  NEED_BOOTSTRAP=1
+elif ! /usr/local/bin/clojure -M -m platform-mvp.compiler >/dev/null 2>&1; then
+  NEED_BOOTSTRAP=1
 fi
 
-"$CLOJURE_BIN" --version | sed 's/^/  /'
-
-step "Verify generate (alias-free)"
-if ! "$CLOJURE_BIN" -M -m platform-mvp.compiler >/dev/null 2>&1; then
-  err "clojure -M -m platform-mvp.compiler failed. Run ./scripts/doctor.sh for details."
+if [[ "$NEED_BOOTSTRAP" -eq 1 ]]; then
+  step "Auto-bootstrap (first run or broken env)"
+  ./scripts/wsl-bootstrap.sh
 fi
-ok "Generate works with: clojure -M -m platform-mvp.compiler"
 
-step "Docker check"
-if docker info >/dev/null 2>&1; then
-  ok "Docker daemon reachable"
-else
-  warn "Docker is not running."
-  warn "Start Docker Desktop and enable WSL integration, or run: sudo service docker start"
-  err "Docker required for terraform apply and MCP operations demo"
+export CLOJURE_BIN=/usr/local/bin/clojure
+
+step "CRLF fix"
+./scripts/fix-line-endings.sh
+ok "line endings OK"
+
+step "Docker"
+if ! docker info >/dev/null 2>&1; then
+  warn "Docker not available — running lite demo instead"
+  exec ./scripts/demo-wsl-lite.sh
 fi
+ok "Docker OK"
 
 echo
-echo -e "${GREEN}WSL preflight passed. Starting full demo...${NC}"
-echo
-
+ok "Starting full demo..."
 exec env CLOJURE_BIN="$CLOJURE_BIN" ./scripts/demo.sh
