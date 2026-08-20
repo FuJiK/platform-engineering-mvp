@@ -1,0 +1,11 @@
+# Force LF line endings (required for WSL / Linux shell scripts).
+* text=auto
+
+*.sh text eol=lf
+*.edn text eol=lf
+*.clj text eol=lf
+*.cljc text eol=lf
+*.json text eol=lf
+*.md text eol=lf
+*.tf text eol=lf
+*.tf.json text eol=lf
