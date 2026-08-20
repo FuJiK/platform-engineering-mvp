@@ -1,0 +1,15 @@
+{
+  "_comment": "Use only when VS Code runs on Windows (NOT Remote-WSL). Replace YOUR_WSL_USER and repo path.",
+  "servers": {
+    "platform-mvp-operator": {
+      "type": "stdio",
+      "command": "C:\\Windows\\System32\\wsl.exe",
+      "args": [
+        "-e",
+        "bash",
+        "-lc",
+        "cd /home/YOUR_WSL_USER/path/to/platform-engineering-mvp && PLATFORM_ROLE=operator clojure -M:mcp"
+      ]
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "servers": {
+    "platform-mvp-operator": {
+      "type": "stdio",
+      "command": "bash",
+      "args": ["scripts/mcp-vscode-wsl.sh"],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "PLATFORM_ROLE": "operator"
+      }
+    },
+    "platform-mvp-sre": {
+      "type": "stdio",
+      "command": "bash",
+      "args": ["scripts/mcp-vscode-wsl.sh"],
+      "cwd": "${workspaceFolder}",
+      "env": {
+        "PLATFORM_ROLE": "sre"
+      }
+    }
+  }
+}
