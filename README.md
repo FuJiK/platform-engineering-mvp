@@ -150,6 +150,28 @@ PLATFORM_ROLE=operator clojure -M:mcp
 clojure -M:test
 ```
 
+## 7. デモ（一括実行）
+
+macOS / Linux:
+
+```bash
+./scripts/demo.sh
+```
+
+WSL（CRLF 修正・PATH 正規化つき）:
+
+```bash
+./scripts/demo-wsl.sh
+```
+
+環境診断:
+
+```bash
+./scripts/doctor.sh
+```
+
+`demo` は **テスト → 生成 → terraform apply → MCP（Operator + SRE）** まで一気に実行します。
+
 ## Domain Model
 
 `domain/service.edn` が唯一の入力です。

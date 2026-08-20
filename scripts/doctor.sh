@@ -69,8 +69,18 @@ fi
 
 echo
 if [[ $fail -eq 0 ]]; then
-  echo "=== All critical checks passed. Run: ./scripts/demo.sh ==="
+  echo "=== All critical checks passed."
+  if grep -qiE 'microsoft|wsl' /proc/version 2>/dev/null; then
+    echo "    WSL: ./scripts/demo-wsl.sh"
+  else
+    echo "    Run: ./scripts/demo.sh"
+  fi
 else
-  echo "=== Fix errors above, then run: ./scripts/demo.sh ==="
+  echo "=== Fix errors above, then retry."
+  if grep -qiE 'microsoft|wsl' /proc/version 2>/dev/null; then
+    echo "    WSL: ./scripts/demo-wsl.sh"
+  else
+    echo "    Run: ./scripts/demo.sh"
+  fi
   exit 1
 fi
