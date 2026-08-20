@@ -22,4 +22,4 @@ if [[ ! -f "$REPO_ROOT/generated/ops-policy.json" ]]; then
 fi
 
 export PLATFORM_ROLE="${PLATFORM_ROLE:-operator}"
-exec clojure -M:mcp
+exec clojure -M -m platform-mvp.mcp
