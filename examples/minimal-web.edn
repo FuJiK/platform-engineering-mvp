@@ -1,0 +1,15 @@
+{:service :example-minimal-web
+ :environment :local
+
+ :container
+ {:image "nginx:alpine"
+  :host-port 8080
+  :container-port 80}
+
+ ;; Minimal web service: operator and SRE share read-only ops; restart is SRE-only.
+ :operations
+ {:get-status {:roles #{:operator :sre}}
+  :get-logs {:roles #{:operator :sre}
+             :max-lines 100}
+  :restart-service {:roles #{:sre}
+                     :approval :required}}}

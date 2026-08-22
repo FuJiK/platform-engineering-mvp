@@ -1,0 +1,15 @@
+{:service :example-alt-port
+ :environment :local
+
+ :container
+ {:image "nginx:alpine"
+  :host-port 8888
+  :container-port 80}
+
+ ;; Same operations as the default MVP, but bound to host port 8888.
+ :operations
+ {:get-status {:roles #{:operator :sre}}
+  :get-logs {:roles #{:operator :sre}
+             :max-lines 200}
+  :restart-service {:roles #{:sre}
+                     :approval :required}}}
