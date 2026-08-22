@@ -45,8 +45,24 @@ jq . generated/ops-policy.json
 
 step "3. Terraform apply (nginx on :8080)"
 cd generated
-terraform init -input=false >/dev/null
-terraform apply -auto-approve -input=false
+if ! terraform init -input=false >/dev/null; then
+  echo
+  echo "Terraform init failed."
+  echo "Recovery:"
+  echo "  1. Ensure Docker is installed and running (./scripts/doctor.sh)"
+  echo "  2. cd generated && rm -rf .terraform .terraform.lock.hcl && terraform init"
+  exit 1
+fi
+if ! terraform apply -auto-approve -input=false; then
+  echo
+  echo "Terraform apply failed."
+  echo "Recovery:"
+  echo "  1. Check Docker: docker info"
+  echo "  2. Inspect state: cd generated && terraform plan"
+  echo "  3. Clean up partial resources: cd generated && terraform destroy"
+  echo "  4. Regenerate inputs: clojure -M:generate"
+  exit 1
+fi
 cd ..
 HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" http://localhost:8080)
 ok "curl http://localhost:8080 → HTTP ${HTTP_CODE}"
