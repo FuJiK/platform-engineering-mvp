@@ -1,0 +1,14 @@
+{:service :example-read-only
+ :environment :local
+
+ :container
+ {:image "nginx:alpine"
+  :host-port 9090
+  :container-port 80}
+
+ ;; Operator-only read path: no restart-service operation at all.
+ ;; Useful for dashboards and AI agents that must never mutate infrastructure.
+ :operations
+ {:get-status {:roles #{:operator}}
+  :get-logs {:roles #{:operator}
+             :max-lines 50}}}

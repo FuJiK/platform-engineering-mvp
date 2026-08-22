@@ -170,6 +170,10 @@ WSL（CRLF 修正・PATH 正規化つき）:
 ./scripts/doctor.sh
 ```
 
+## Examples
+
+`examples/` に複数の `service.edn` パターンがあります。詳細は [examples/README.md](examples/README.md)。
+
 `demo` は **テスト → 生成 → terraform apply → MCP（Operator + SRE）** まで一気に実行します。
 
 ## Domain Model
