@@ -218,6 +218,8 @@ WSL（CRLF 修正・PATH 正規化つき）:
 
 このローカルMVPが動いたら、Docker AdapterをAWSまたはAzureへ差し替えます。
 
+詳細ロードマップ（IAM / Audit / Rate Limit 含む）: [docs/production-roadmap.md](docs/production-roadmap.md)
+
 ```text
 Phase 1: Docker + nginx      ← 今ここ
 Phase 2: AWS ECS or Azure App Service
