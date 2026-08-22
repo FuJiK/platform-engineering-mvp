@@ -112,6 +112,9 @@ MCP stdioは1行1JSON-RPCメッセージです。まずサーバーを起動し�
 PLATFORM_ROLE=operator clojure -M:mcp
 ```
 
+プロトコルバージョン `2025-11-25` は MCP 公式仕様の stable リリースです（プレースホルダーではありません）。
+詳細: [docs/mcp-protocol-version.md](docs/mcp-protocol-version.md)
+
 標準入力へ以下を1行ずつ渡します。
 
 ### initialize

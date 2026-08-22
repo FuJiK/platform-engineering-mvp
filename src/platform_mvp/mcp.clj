@@ -5,6 +5,9 @@
             [platform-mvp.docker :as docker]
             [platform-mvp.policy :as policy]))
 
+;; MCP protocol version negotiated during initialize.
+;; This matches the MCP specification stable release (not a placeholder):
+;; https://modelcontextprotocol.io/specification/2025-11-25
 (def protocol-version "2025-11-25")
 (def policy-path "generated/ops-policy.json")
 
