@@ -61,10 +61,18 @@ fi
 
 echo
 echo "--- Docker ---"
-if docker info >/dev/null 2>&1; then
-  ok "docker daemon running"
+if command -v docker >/dev/null 2>&1; then
+  ok "docker CLI installed at $(command -v docker)"
+  if docker info >/dev/null 2>&1; then
+    ok "docker daemon running"
+  else
+    warn "docker CLI found but daemon is not running (needed for terraform apply + MCP ops)"
+    echo "    Start Docker Desktop or run: sudo service docker start"
+  fi
 else
-  warn "docker not running (needed for terraform apply + MCP ops)"
+  err "docker CLI not found (needed for terraform apply + MCP ops)"
+  echo "    Install: https://docs.docker.com/engine/install/"
+  echo "    Or on Ubuntu: sudo apt-get update && sudo apt-get install -y docker.io"
 fi
 
 echo
