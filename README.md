@@ -176,6 +176,8 @@ WSL（CRLF 修正・PATH 正規化つき）:
 
 `domain/service.edn` が唯一の入力です。
 
+詳細: [docs/domain-model.md](docs/domain-model.md)
+
 ```clojure
 {:service :platform-mvp-web
  :environment :local
@@ -213,6 +215,9 @@ WSL（CRLF 修正・PATH 正規化つき）:
 ```
 
 本番化するときは、さらにCloud IAM / Managed Identity、OIDC、監査ログ、Rate Limit、Approval Service、MCP Gateway / Catalogを追加します。
+
+- [本番セキュリティチェックリスト](docs/production-security-checklist.md)
+- [ADR 001: 3層アーキテクチャ](docs/adr/001-three-layer-architecture.md)
 
 ## 次の拡張
 
