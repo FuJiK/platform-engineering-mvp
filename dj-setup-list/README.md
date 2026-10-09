@@ -1,61 +1,69 @@
 # dj-setup-list
 
-DJさんが現場前にセットアップリスト（機材・メディア・連絡事項）を素早く作るための C# CLI です。
+DJさんが現場前にセットアップリスト（機材・連絡・音源）を作るための C# ツールです。
+
+**テンプレートは静的なチェックリスト**です。曲データはテンプレートからは取りません。音源は別レイヤで:
+
+| ソース | いまできること | 必要な設定 |
+|--------|----------------|------------|
+| **Local** | フォルダ内の音源スキャン / M3U 読込 / オフライン判定 | `DJ_LOCAL_LIBRARY` または `Music:Local:LibraryPaths` |
+| **Spotify** | カタログ検索、プレイリスト取得、Web OAuth | `SPOTIFY_CLIENT_ID` / `SECRET`（+ `REFRESH_TOKEN`） |
+| **SoundCloud** | 検索・URL resolve・プレイリスト取得 | `SOUNDCLOUD_CLIENT_ID` または `ACCESS_TOKEN` |
+| **Apple Music** | カタログ検索・プレイリスト曲取得 | `APPLE_MUSIC_TEAM_ID` / `KEY_ID` / 秘密鍵 |
+
+## 構成
+
+```text
+dj-setup-list/
+  src/DjSetupList.Core   # モデル・テンプレート・音源プロバイダ
+  src/DjSetupList        # CLI
+  src/DjSetupList.Web    # Web UI (http://127.0.0.1:5088)
+  sample-library/        # Local デモ用
+```
 
 ## 必要環境
 
-- [.NET SDK 8](https://dotnet.microsoft.com/download/dotnet/8.0)
+- .NET SDK 8
 
 ```bash
-# 未インストールなら（Linux / WSL）
 curl -fsSL https://dot.net/v1/dotnet-install.sh | bash -s -- --channel 8.0
 export DOTNET_ROOT="$HOME/.dotnet"
 export PATH="$DOTNET_ROOT:$DOTNET_ROOT/tools:$PATH"
 ```
 
-診断:
-
-```bash
-../../scripts/dotnet-doctor.sh   # リポジトリルートからなら ./scripts/dotnet-doctor.sh
-dotnet --info
-dotnet run --project src/DjSetupList -- doctor
-```
-
-## すぐ使う
+## CLI
 
 ```bash
 cd dj-setup-list
+export DJ_LOCAL_LIBRARY="$PWD/sample-library"
+
 dotnet run --project src/DjSetupList -- templates
-dotnet run --project src/DjSetupList -- new \
-  --template club \
-  --event "Friday Night" \
-  --venue "Club Neon" \
-  --date 2026-10-15 \
-  --output friday.md
+dotnet run --project src/DjSetupList -- sources
+dotnet run --project src/DjSetupList -- music-search --source local --query Opening
+
+dotnet run --project src/DjSetupList -- new -t club -e "Friday Night" -v "Club Neon" --date 2026-10-15 -o friday.md
+dotnet run --project src/DjSetupList -- music-attach \
+  --list setup-lists/20261015-friday-night.json \
+  --source local \
+  --playlist sample-library/demo-set.m3u \
+  --name "Opening set"
 ```
 
-編集用 JSON が `setup-lists/` に保存されます。チェックを進める例:
+## Web UI
 
 ```bash
-dotnet run --project src/DjSetupList -- check \
-  --list setup-lists/20261015-friday-night.json \
-  --item USB
-
-dotnet run --project src/DjSetupList -- summary \
-  --list setup-lists/20261015-friday-night.json
+cd dj-setup-list
+export DJ_LOCAL_LIBRARY="$PWD/sample-library"
+dotnet run --project src/DjSetupList.Web --urls http://127.0.0.1:5088
 ```
 
-## テンプレート
+ブラウザで http://127.0.0.1:5088
 
-| ID | 用途 |
-|----|------|
-| `club` | クラブ / ブース持ち込み（USB・HP中心） |
-| `mobile` | フル持ち込み（プレイヤー〜PA） |
-| `outdoor` | 屋外 / フェス（電源・天候） |
-| `wedding` | 結婚式 / パーティー（進行・禁止曲） |
-| `usb-only` | USBのみの超軽量セット |
+- リスト作成 / チェック操作
+- 音源検索（Local はすぐ、他は API キー設定後）
+- Spotify は `/auth/spotify/login` で OAuth
 
-`--extra "項目A,項目B"` で追加項目を足せます。
+設定は `src/DjSetupList.Web/appsettings.json` の `Music` セクション、または環境変数。
 
 ## テスト
 
@@ -63,8 +71,9 @@ dotnet run --project src/DjSetupList -- summary \
 dotnet test
 ```
 
-## 出力形式
+## 診断
 
-- `md` — Markdown チェックリスト（共有向き）
-- `txt` — プレーンテキスト
-- `json` — 再編集・進捗管理用
+```bash
+../../scripts/dotnet-doctor.sh
+dotnet run --project src/DjSetupList -- doctor
+```

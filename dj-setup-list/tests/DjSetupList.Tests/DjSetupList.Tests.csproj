@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\src\DjSetupList\DjSetupList.csproj" />
+    <ProjectReference Include="..\..\src\DjSetupList.Core\DjSetupList.Core.csproj" />
   </ItemGroup>
 
 </Project>

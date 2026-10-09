@@ -1,4 +1,5 @@
 using DjSetupList.Models;
+using DjSetupList.Music;
 using DjSetupList.Services;
 using DjSetupList.Templates;
 
@@ -28,6 +29,9 @@ public static class App
                 "uncheck" => CheckCommand(parser, check: false),
                 "export" => ExportCommand(parser),
                 "summary" => SummaryCommand(parser),
+                "sources" => SourcesCommand(),
+                "music-search" => MusicSearchCommand(parser),
+                "music-attach" => MusicAttachCommand(parser),
                 "doctor" => DoctorCommand(),
                 _ => Unknown(command)
             };
@@ -253,6 +257,70 @@ public static class App
         return 0;
     }
 
+    private static int SourcesCommand()
+    {
+        var catalog = MusicSourceCatalog.FromEnvironment();
+        Console.WriteLine("音源プロバイダ:");
+        Console.WriteLine();
+        foreach (var status in catalog.Statuses())
+        {
+            var mark = status.Available ? "✓" : "·";
+            Console.WriteLine($"  {mark} {status.DisplayName,-12} configured={status.Configured} available={status.Available}");
+            if (!string.IsNullOrWhiteSpace(status.Message))
+                Console.WriteLine($"               {status.Message}");
+        }
+
+        Console.WriteLine();
+        Console.WriteLine("※ テンプレート自体は静的チェックリストです。音源は Local / Spotify / SoundCloud / Apple Music から別途検索・添付します。");
+        return 0;
+    }
+
+    private static int MusicSearchCommand(ArgParser parser)
+    {
+        var sourceName = parser.Get("source") ?? parser.Positionals.ElementAtOrDefault(0)
+            ?? throw new ArgumentException("--source local|spotify|soundcloud|applemusic を指定してください。");
+        var query = parser.Get("query") ?? parser.Positionals.ElementAtOrDefault(1) ?? "";
+        var catalog = MusicSourceCatalog.FromEnvironment();
+        var source = catalog.TryGet(sourceName)
+            ?? throw new ArgumentException($"未知の音源: {sourceName}");
+
+        var result = source.SearchAsync(query).GetAwaiter().GetResult();
+        if (!string.IsNullOrWhiteSpace(result.Warning))
+            Console.WriteLine($"警告: {result.Warning}");
+
+        Console.WriteLine($"[{source.DisplayName}] tracks={result.Tracks.Count} playlists={result.Playlists.Count}");
+        foreach (var pl in result.Playlists.Take(20))
+            Console.WriteLine($"  playlist  {pl.Id}  {pl.Name} ({pl.TrackCount?.ToString() ?? "?"}曲)");
+        foreach (var tr in result.Tracks.Take(30))
+            Console.WriteLine($"  track     {tr.Id}  {tr.Display}");
+        return 0;
+    }
+
+    private static int MusicAttachCommand(ArgParser parser)
+    {
+        var path = RequireListPath(parser);
+        var sourceName = parser.GetRequired("source");
+        var playlist = parser.Get("playlist") ?? parser.Get("url")
+            ?? throw new ArgumentException("--playlist <id|path|url> を指定してください。");
+        var catalog = MusicSourceCatalog.FromEnvironment();
+        var source = catalog.TryGet(sourceName)
+            ?? throw new ArgumentException($"未知の音源: {sourceName}");
+
+        var tracks = source.GetPlaylistTracksAsync(playlist).GetAwaiter().GetResult();
+        var list = SetupListStore.Load(path);
+        list.Music.Add(new MusicAttachment
+        {
+            Source = source.Kind,
+            PlaylistId = playlist,
+            PlaylistName = parser.Get("name") ?? playlist,
+            PlaylistUrl = playlist.StartsWith("http", StringComparison.OrdinalIgnoreCase) ? playlist : null,
+            Tracks = tracks.ToList()
+        });
+        SetupListStore.Save(list, path);
+        Console.WriteLine($"添付: {source.DisplayName} / {tracks.Count}曲（オフライン可 {tracks.Count(t => t.OfflineReady)}）");
+        return 0;
+    }
+
     private static int DoctorCommand()
     {
         Console.WriteLine("=== DJ Setup List — .NET Doctor ===");
@@ -263,6 +331,14 @@ public static class App
         Console.WriteLine($"Templates: {BuiltinTemplates.All.Count}");
         foreach (var t in BuiltinTemplates.All)
             Console.WriteLine($"  - {t.Id}");
+        Console.WriteLine();
+        Console.WriteLine("Music sources:");
+        foreach (var status in MusicSourceCatalog.FromEnvironment().Statuses())
+        {
+            var mark = status.Available ? "✓" : "·";
+            Console.WriteLine($"  {mark} {status.DisplayName}: {status.Message}");
+        }
+
         Console.WriteLine();
         Console.WriteLine("OK");
         return 0;
@@ -288,6 +364,9 @@ public static class App
               dj-setup-list uncheck --list <file.json> --item <名前|ID> [--all]
               dj-setup-list export --list <file.json> [--format md|txt|json] [-o out]
               dj-setup-list summary --list <file.json>
+              dj-setup-list sources
+              dj-setup-list music-search --source local|spotify|soundcloud|applemusic --query "..."
+              dj-setup-list music-attach --list <file.json> --source local --playlist /path/to/set.m3u
               dj-setup-list doctor
 
             new オプション:

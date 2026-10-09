@@ -19,3 +19,4 @@ dj-setup-list/setup-lists/
 *.user
 *.suo
 .vs/
+dj-setup-list/src/DjSetupList.Web/App_Data/
