@@ -2,5 +2,6 @@
   "name": "platform-engineering-mvp",
   "repositoryDependencies": [
     "github.com/FuJiK/myblog"
-  ]
+  ],
+  "install": "curl -fsSL https://dot.net/v1/dotnet-install.sh | bash -s -- --channel 8.0 --install-dir \"$HOME/.dotnet\" && sudo ln -sfn \"$HOME/.dotnet/dotnet\" /usr/local/bin/dotnet"
 }

@@ -11,3 +11,12 @@ generated/ops-policy.json
 .tools/
 linux-install.sh
 .DS_Store
+
+# .NET / dj-setup-list
+**/bin/
+**/obj/
+dj-setup-list/setup-lists/
+*.user
+*.suo
+.vs/
+dj-setup-list/src/DjSetupList.Web/App_Data/

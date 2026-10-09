@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>DJ Setup List</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/app.css" />
+</head>
+<body>
+  <div class="atmosphere" aria-hidden="true"></div>
+  <header class="top">
+    <a class="brand" href="#home" data-nav="home">DJ Setup List</a>
+    <nav>
+      <button type="button" data-nav="home">ホーム</button>
+      <button type="button" data-nav="lists">リスト</button>
+      <button type="button" data-nav="music">音源</button>
+      <button type="button" data-nav="sources">連携</button>
+    </nav>
+  </header>
+
+  <main>
+    <section id="view-home" class="view active">
+      <div class="hero">
+        <p class="brand-mark">DJ Setup List</p>
+        <h1>現場前のセットアップを、ひとつのリストに。</h1>
+        <p class="lede">機材チェックから音源の添付まで。ローカル / Spotify / SoundCloud / Apple Music をつなげて準備できます。</p>
+        <div class="cta-row">
+          <button type="button" class="btn primary" data-nav="create">リストを作る</button>
+          <button type="button" class="btn ghost" data-nav="music">音源を探す</button>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-create" class="view">
+      <h2>新しいセットアップリスト</h2>
+      <form id="create-form" class="panel form-grid">
+        <label>テンプレート
+          <select name="templateId" id="template-select" required></select>
+        </label>
+        <label>イベント名
+          <input name="eventName" placeholder="Friday Night" />
+        </label>
+        <label>会場
+          <input name="venue" placeholder="Club Neon" />
+        </label>
+        <label>日付
+          <input name="date" type="date" />
+        </label>
+        <label>開始
+          <input name="startTime" placeholder="22:00" />
+        </label>
+        <label class="span-2">追加項目（カンマ区切り）
+          <input name="extraItems" placeholder="ゴーグル, 予備シャツ" />
+        </label>
+        <label class="span-2">メモ
+          <textarea name="notes" rows="3" placeholder="搬入口は裏手、22:00 音出しOK"></textarea>
+        </label>
+        <div class="span-2">
+          <button class="btn primary" type="submit">作成する</button>
+        </div>
+      </form>
+    </section>
+
+    <section id="view-lists" class="view">
+      <div class="section-head">
+        <h2>保存済みリスト</h2>
+        <button type="button" class="btn ghost" data-nav="create">新規</button>
+      </div>
+      <div id="lists" class="stack"></div>
+    </section>
+
+    <section id="view-detail" class="view">
+      <div class="section-head">
+        <button type="button" class="btn ghost" data-nav="lists">← 戻る</button>
+        <div class="actions">
+          <a id="export-md" class="btn ghost" href="#" target="_blank">Markdown</a>
+          <button type="button" class="btn ghost" id="open-attach">音源を添付</button>
+        </div>
+      </div>
+      <div id="detail" class="stack"></div>
+    </section>
+
+    <section id="view-music" class="view">
+      <h2>音源を探す</h2>
+      <p class="hint">テンプレートは静的なチェック項目です。曲そのものはここから Local / 各ストリーミングへ取りにいきます。</p>
+      <form id="search-form" class="panel inline-form">
+        <select name="source" id="search-source">
+          <option value="local">Local</option>
+          <option value="spotify">Spotify</option>
+          <option value="soundcloud">SoundCloud</option>
+          <option value="applemusic">Apple Music</option>
+        </select>
+        <input name="q" placeholder="曲名 / プレイリスト / SoundCloud URL" />
+        <button class="btn primary" type="submit">検索</button>
+      </form>
+      <div id="search-results" class="stack"></div>
+    </section>
+
+    <section id="view-sources" class="view">
+      <h2>音源連携ステータス</h2>
+      <div id="sources" class="stack"></div>
+      <p class="hint">Spotify は <a href="/auth/spotify/login">OAuth ログイン</a> でユーザープレイリストに接続できます（ClientId/Secret 設定時）。</p>
+    </section>
+  </main>
+
+  <dialog id="attach-dialog">
+    <form method="dialog" id="attach-form" class="panel">
+      <h3>このリストに音源を添付</h3>
+      <label>ソース
+        <select name="source" id="attach-source">
+          <option value="local">Local</option>
+          <option value="spotify">Spotify</option>
+          <option value="soundcloud">SoundCloud</option>
+          <option value="applemusic">Apple Music</option>
+        </select>
+      </label>
+      <label>プレイリスト ID / パス / URL
+        <input name="playlist" required placeholder="local-playlist:/path/set.m3u または Spotify playlist id" />
+      </label>
+      <label>表示名
+        <input name="name" placeholder="Opening set" />
+      </label>
+      <div class="cta-row">
+        <button class="btn ghost" value="cancel" type="submit">キャンセル</button>
+        <button class="btn primary" id="attach-submit" type="button">添付</button>
+      </div>
+    </form>
+  </dialog>
+
+  <script src="/app.js" type="module"></script>
+</body>
+</html>

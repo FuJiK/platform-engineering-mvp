@@ -34,6 +34,8 @@ Clojure + EDN + Terraform JSON + MCP で、次の1本を最小構成で実証す
 - Terraform
 - Docker Engine / Docker Desktop
 
+C# / DJセットアップリスト補助ツールを使う場合は追加で [.NET SDK 8](https://dotnet.microsoft.com/download/dotnet/8.0) が必要です。詳細は [`dj-setup-list/README.md`](dj-setup-list/README.md) と `./scripts/dotnet-doctor.sh` を参照。
+
 ## 1. 生成
 
 ```bash
