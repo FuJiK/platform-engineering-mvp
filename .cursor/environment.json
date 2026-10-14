@@ -2,5 +2,10 @@
   "name": "platform-engineering-mvp",
   "repositoryDependencies": [
     "github.com/FuJiK/myblog"
+  ],
+  "install": "bash scripts/setup-dev.sh",
+  "start": "bash scripts/start-dev.sh",
+  "ports": [
+    { "name": "nginx", "port": 8080 }
   ]
 }

@@ -29,10 +29,19 @@ Clojure + EDN + Terraform JSON + MCP で、次の1本を最小構成で実証す
 
 ## 前提
 
-- Java 17以上
-- Clojure CLI
-- Terraform
-- Docker Engine / Docker Desktop
+Java 17以上、Clojure CLI、Terraform、Docker、jq。無いものは次のスクリプトが入れます。macOS は Homebrew、Linux / WSL は apt です。入っているものは飛ばします。
+
+```bash
+./scripts/setup-dev.sh
+```
+
+Docker が止まっているとき:
+
+```bash
+./scripts/start-dev.sh
+```
+
+Cloud Agent も同じ2本を、起動前の `install` と毎起動の `start` から実行します。
 
 ## 1. 生成
 

@@ -37,12 +37,11 @@ if command -v clojure >/dev/null; then
   ok "clojure at $(which clojure)"
   clojure --version 2>&1 | sed 's/^/    /'
   if [[ "$(which clojure)" == /mnt/* ]]; then
-    warn "clojure is on Windows PATH — install inside WSL: /usr/local/bin/clojure"
+    warn "clojure is on Windows PATH — run ./scripts/setup-dev.sh inside WSL"
   fi
 else
   err "clojure not found"
-  echo "    Install: curl -L -O https://github.com/clojure/brew-install/releases/latest/download/linux-install.sh"
-  echo "             chmod +x linux-install.sh && sudo ./linux-install.sh"
+  echo "    Run: ./scripts/setup-dev.sh"
 fi
 
 echo
@@ -65,6 +64,7 @@ if docker info >/dev/null 2>&1; then
   ok "docker daemon running"
 else
   warn "docker not running (needed for terraform apply + MCP ops)"
+  echo "    Run: ./scripts/start-dev.sh"
 fi
 
 echo
